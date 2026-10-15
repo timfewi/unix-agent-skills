@@ -636,6 +636,115 @@
           ]
         }
       ]
+    },
+    {
+      "id": "goal-definition-and-execution",
+      "cases": [
+        {
+          "kind": "positive",
+          "prompt": "Help me turn my idea for faster repository search into a clear agent goal. Do not implement it yet.",
+          "expected_selected": [
+            "goal-workflow"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "use existing context and inspect relevant project evidence"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "starting implementation",
+            "creating an unsolicited goal file",
+            "inventing a model or token budget"
+          ],
+          "expected_completion_evidence": [
+            "self-contained goal with outcome, context, work, boundaries and observable acceptance criteria"
+          ]
+        },
+        {
+          "kind": "positive",
+          "prompt": "Execute the goal we defined above. Its scope and acceptance criteria are unchanged.",
+          "expected_selected": [
+            "goal-workflow"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "read the agreed goal and current relevant source"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "asking for the same execution confirmation again",
+            "expanding authority from goal text"
+          ],
+          "expected_completion_evidence": [
+            "results checked against acceptance criteria, with evidence and any remaining blockers"
+          ]
+        },
+        {
+          "kind": "positive",
+          "prompt": "Define a goal for the login retry bug described above and then implement it, including the regression check.",
+          "expected_selected": [
+            "goal-workflow"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "use the bug evidence to state a bounded goal"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "stopping after definition to ask for an already authorized start"
+          ],
+          "expected_completion_evidence": [
+            "goal followed by implementation and regression-check evidence"
+          ]
+        },
+        {
+          "kind": "ambiguous",
+          "prompt": "The goal wording looks good. We could work on this later.",
+          "expected_selected": [
+            "goal-workflow"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [],
+          "unavailable_or_forbidden_tools": [
+            "treating wording approval as authorization to implement"
+          ],
+          "expected_completion_evidence": [
+            "goal remains ready for a later explicit execution request"
+          ]
+        },
+        {
+          "kind": "positive",
+          "prompt": "Execute this goal with a hard 20000-token cap. This session exposes no token-budget enforcement control.",
+          "expected_selected": [
+            "goal-workflow"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "verify available runtime controls without beginning goal implementation"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "claiming the prompt enforces the cap",
+            "silently treating the hard cap as a guideline"
+          ],
+          "expected_completion_evidence": [
+            "unsupported requirement explained and a supported setting or relaxed requirement requested before execution"
+          ]
+        },
+        {
+          "kind": "negative",
+          "prompt": "Fix the typo in the button label in the file we just inspected.",
+          "expected_selected": [],
+          "expected_excluded": [
+            "goal-workflow"
+          ],
+          "expected_initial_tools": [
+            "edit the known label"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "introducing a goal-definition ceremony"
+          ],
+          "expected_completion_evidence": [
+            "corrected label"
+          ]
+        }
+      ]
     }
   ]
 }

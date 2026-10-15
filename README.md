@@ -11,6 +11,7 @@ Each skill does one job, stands alone and is short enough to load whole.
 | Domain | Skill | Use when |
 | --- | --- | --- |
 | `agent/` | `context-management` | a session resumes, compacts or fills with output |
+| | `goal-workflow` | defining an agent goal or explicitly executing a previously defined goal |
 | | `tool-use` | choosing a tool for an evidence question and running calls efficiently |
 | | `host-cli-usage` | invoking an unfamiliar CLI or after an argument error |
 | | `capability-incident-diagnoser` | a tool, MCP server or sandboxed operation is missing or denied |
@@ -96,7 +97,7 @@ nix flake check --no-build  # evaluates all three systems
 
 ## Status
 
-2026-10-15: 13 skills in five domains, 34 routing cases. The validator, its
+2026-10-16: 14 skills in five domains, 40 routing cases. The validator, its
 unit tests, the snapshot-script tests (Linux), ruff, shellcheck and Nix lint
 pass. The macOS paths of `proc-snapshot.sh` and the macOS forms in
 `portable-shell` have not been run on macOS. No model comparison has been run
