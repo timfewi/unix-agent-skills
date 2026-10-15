@@ -1,0 +1,6 @@
+.direnv
+result
+result-*
+__pycache__
+.ruff_cache
+.ast-index/

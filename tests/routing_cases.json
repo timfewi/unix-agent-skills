@@ -1,0 +1,641 @@
+{
+  "schema_version": 1,
+  "note": "Description-level routing rubrics. The validator checks structure and skill names; it does not run a model.",
+  "groups": [
+    {
+      "id": "context-resume",
+      "cases": [
+        {
+          "kind": "positive",
+          "prompt": "Resume yesterday's half-finished migration. The earlier session's file excerpts and test results are in the transcript.",
+          "expected_selected": [
+            "context-management"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "recheck changed files",
+            "rerun the last relevant check"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "reasoning from the old test result"
+          ],
+          "expected_completion_evidence": [
+            "checkpoint with current evidence and next action"
+          ]
+        },
+        {
+          "kind": "negative",
+          "prompt": "Rename one variable in the file you just read.",
+          "expected_selected": [],
+          "expected_excluded": [
+            "context-management"
+          ],
+          "expected_initial_tools": [
+            "edit of the known file"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "writing a progress checkpoint"
+          ],
+          "expected_completion_evidence": [
+            "the renamed variable"
+          ]
+        },
+        {
+          "kind": "ambiguous",
+          "prompt": "The context window is nearly full halfway through a refactor with two failing tests.",
+          "expected_selected": [
+            "context-management",
+            "fast-checks"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "checkpoint of goal, failures and changed files"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "deleting notes to save context"
+          ],
+          "expected_completion_evidence": [
+            "failure signatures preserved across compaction"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "known-file-vs-discovery",
+      "cases": [
+        {
+          "kind": "positive",
+          "prompt": "Explain the release protocol in docs/RELEASE.md; the repository and path are known.",
+          "expected_selected": [
+            "tool-use"
+          ],
+          "expected_excluded": [
+            "filesystem-wizard"
+          ],
+          "expected_initial_tools": [
+            "bounded read of docs/RELEASE.md"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "repository-wide search for the known file"
+          ],
+          "expected_completion_evidence": [
+            "the relevant protocol excerpt"
+          ]
+        },
+        {
+          "kind": "positive",
+          "prompt": "In an unfamiliar repository, find where request rate limiting is implemented and which test covers it.",
+          "expected_selected": [
+            "filesystem-wizard"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "repository instructions",
+            "scoped rg literal search"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "searching the whole home directory"
+          ],
+          "expected_completion_evidence": [
+            "owning file paths and the covering test command"
+          ]
+        },
+        {
+          "kind": "negative",
+          "prompt": "Explain the policy excerpt that was already quoted earlier in this conversation.",
+          "expected_selected": [],
+          "expected_excluded": [
+            "filesystem-wizard",
+            "tool-use"
+          ],
+          "expected_initial_tools": [],
+          "unavailable_or_forbidden_tools": [
+            "rereading the unchanged excerpt"
+          ],
+          "expected_completion_evidence": [
+            "an explanation grounded in the excerpt"
+          ]
+        },
+        {
+          "kind": "ambiguous",
+          "prompt": "Find every caller of parse_config and migrate them after changing its signature.",
+          "expected_selected": [
+            "filesystem-wizard",
+            "lean-code"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "code index callers or literal search",
+            "focused reads of each caller"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "leaving a compatibility shim without a consumer"
+          ],
+          "expected_completion_evidence": [
+            "all callers migrated and checked"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cli-syntax-vs-capability-incident",
+      "cases": [
+        {
+          "kind": "positive",
+          "prompt": "`ast-index search --query Config` failed with \"unexpected argument '--query' found\".",
+          "expected_selected": [
+            "host-cli-usage"
+          ],
+          "expected_excluded": [
+            "capability-incident-diagnoser"
+          ],
+          "expected_initial_tools": [
+            "ast-index search --help"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "guessing other flag spellings"
+          ],
+          "expected_completion_evidence": [
+            "exact working invocation and exit status"
+          ]
+        },
+        {
+          "kind": "positive",
+          "prompt": "The code_explore MCP tool vanished from the tool list; its server log shows connection refused on the socket.",
+          "expected_selected": [
+            "capability-incident-diagnoser"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "live tool registry",
+            "server stderr"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "direct socket access to bypass the server",
+            "installing a replacement"
+          ],
+          "expected_completion_evidence": [
+            "failure class and enforcing layer"
+          ]
+        },
+        {
+          "kind": "negative",
+          "prompt": "The parser unit test fails with an assertion error on empty input.",
+          "expected_selected": [],
+          "expected_excluded": [
+            "host-cli-usage",
+            "capability-incident-diagnoser"
+          ],
+          "expected_initial_tools": [
+            "read the failing test and parser"
+          ],
+          "unavailable_or_forbidden_tools": [],
+          "expected_completion_evidence": [
+            "fixed parser with the test passing"
+          ]
+        },
+        {
+          "kind": "ambiguous",
+          "prompt": "A sandboxed git push is rejected with EPERM while local commits work.",
+          "expected_selected": [
+            "capability-incident-diagnoser",
+            "brokered-git-operator"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "exact denial output",
+            "granted operation list"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "credential discovery",
+            "force flags"
+          ],
+          "expected_completion_evidence": [
+            "which authority is missing and how to grant it"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "checks-vs-test-freshness",
+      "cases": [
+        {
+          "kind": "positive",
+          "prompt": "Which checks should run after changing the CLI argument parser?",
+          "expected_selected": [
+            "fast-checks"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "declared check commands in README, justfile or CI"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "full VM test suite without request"
+          ],
+          "expected_completion_evidence": [
+            "fast gate plus one focused CLI invocation"
+          ]
+        },
+        {
+          "kind": "positive",
+          "prompt": "All tests pass but the reported bug still reproduces in the real app; the tests mock the HTTP client.",
+          "expected_selected": [
+            "test-freshness"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "trace one assertion through its mock"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "relaxing the expected outcome"
+          ],
+          "expected_completion_evidence": [
+            "a test that fails on the bug"
+          ]
+        },
+        {
+          "kind": "negative",
+          "prompt": "Write the changelog entry for the 2.1 release.",
+          "expected_selected": [],
+          "expected_excluded": [
+            "fast-checks",
+            "test-freshness"
+          ],
+          "expected_initial_tools": [
+            "read existing changelog"
+          ],
+          "unavailable_or_forbidden_tools": [],
+          "expected_completion_evidence": [
+            "changelog entry"
+          ]
+        },
+        {
+          "kind": "ambiguous",
+          "prompt": "Add a regression test for the off-by-one bug and verify the fix.",
+          "expected_selected": [
+            "fast-checks",
+            "test-freshness"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "show the new test failing without the fix"
+          ],
+          "unavailable_or_forbidden_tools": [],
+          "expected_completion_evidence": [
+            "test fails before and passes after the fix"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lean-code-boundaries",
+      "cases": [
+        {
+          "kind": "positive",
+          "prompt": "Simplify the duplicated retry helpers in client.py and server.py without changing behavior.",
+          "expected_selected": [
+            "lean-code"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "read both helpers and their callers",
+            "baseline check"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "weakening assertions"
+          ],
+          "expected_completion_evidence": [
+            "one shared helper, callers migrated, checks pass"
+          ]
+        },
+        {
+          "kind": "negative",
+          "prompt": "Train a reward model that scores code quality.",
+          "expected_selected": [],
+          "expected_excluded": [
+            "lean-code"
+          ],
+          "expected_initial_tools": [],
+          "unavailable_or_forbidden_tools": [],
+          "expected_completion_evidence": [
+            "a training plan"
+          ]
+        },
+        {
+          "kind": "ambiguous",
+          "prompt": "Refactor the authentication middleware and remove the legacy token path.",
+          "expected_selected": [
+            "lean-code",
+            "security-boundary-review"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "identify consumers of the legacy path"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "removing a path with an identified consumer"
+          ],
+          "expected_completion_evidence": [
+            "negative auth tests pass"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "finalize-vs-git-operator",
+      "cases": [
+        {
+          "kind": "positive",
+          "prompt": "The feature is implemented. Wrap it up: review, verify and commit it.",
+          "expected_selected": [
+            "finalize-loop"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "git status --short",
+            "full diff"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "ending with a prose claim instead of a read-back"
+          ],
+          "expected_completion_evidence": [
+            "git log -1 read-back after the commit"
+          ]
+        },
+        {
+          "kind": "positive",
+          "prompt": "Push the already reviewed commit on branch fix/timeout and open a merge request against main.",
+          "expected_selected": [
+            "brokered-git-operator"
+          ],
+          "expected_excluded": [
+            "finalize-loop"
+          ],
+          "expected_initial_tools": [
+            "git status --short --branch",
+            "remote and base state"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "force push"
+          ],
+          "expected_completion_evidence": [
+            "remote ref and merge request identity"
+          ]
+        },
+        {
+          "kind": "negative",
+          "prompt": "Show me the last five commits on this branch.",
+          "expected_selected": [],
+          "expected_excluded": [
+            "brokered-git-operator",
+            "finalize-loop"
+          ],
+          "expected_initial_tools": [
+            "git log --oneline -n 5"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "any mutation"
+          ],
+          "expected_completion_evidence": [
+            "the five commits"
+          ]
+        },
+        {
+          "kind": "ambiguous",
+          "prompt": "Finish this change and push it to the default branch.",
+          "expected_selected": [
+            "finalize-loop",
+            "brokered-git-operator"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "review of the full change set"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "pushing after a no-go verdict"
+          ],
+          "expected_completion_evidence": [
+            "read-back of the pushed ref"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "process-vs-shell",
+      "cases": [
+        {
+          "kind": "positive",
+          "prompt": "The dev server hangs at 100% CPU and port 3000 stays in use after Ctrl+C.",
+          "expected_selected": [
+            "process-debugging"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "find the PID by port",
+            "process snapshot"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "SIGKILL before inspection",
+            "killing other users' processes"
+          ],
+          "expected_completion_evidence": [
+            "process state and confirmed cause"
+          ]
+        },
+        {
+          "kind": "positive",
+          "prompt": "This install script works on Ubuntu but fails on macOS with \"sed: 1: invalid command code\".",
+          "expected_selected": [
+            "portable-shell"
+          ],
+          "expected_excluded": [
+            "process-debugging"
+          ],
+          "expected_initial_tools": [
+            "identify the sed -i call",
+            "check sed variant"
+          ],
+          "unavailable_or_forbidden_tools": [],
+          "expected_completion_evidence": [
+            "portable in-place edit and the tested shells"
+          ]
+        },
+        {
+          "kind": "negative",
+          "prompt": "Write a Python function that parses ISO-8601 dates.",
+          "expected_selected": [],
+          "expected_excluded": [
+            "portable-shell",
+            "process-debugging"
+          ],
+          "expected_initial_tools": [],
+          "unavailable_or_forbidden_tools": [],
+          "expected_completion_evidence": [
+            "function with tests"
+          ]
+        },
+        {
+          "kind": "ambiguous",
+          "prompt": "A cron-run shell script leaves zombie child processes on both Linux and macOS.",
+          "expected_selected": [
+            "process-debugging",
+            "portable-shell"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "ps state of the children and their parent"
+          ],
+          "unavailable_or_forbidden_tools": [],
+          "expected_completion_evidence": [
+            "children reaped on both systems"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shell-portability",
+      "cases": [
+        {
+          "kind": "positive",
+          "prompt": "In zsh, `for f in $files; do wc -l $f; done` treats all names as one argument.",
+          "expected_selected": [
+            "portable-shell"
+          ],
+          "expected_excluded": [
+            "process-debugging"
+          ],
+          "expected_initial_tools": [
+            "identify the shell",
+            "rewrite with an explicit list or array"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "switching the user's login shell"
+          ],
+          "expected_completion_evidence": [
+            "loop output in zsh and bash"
+          ]
+        },
+        {
+          "kind": "positive",
+          "prompt": "A script with #!/bin/bash fails with \"bad interpreter: No such file or directory\" on a NixOS machine.",
+          "expected_selected": [
+            "portable-shell"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "check the shebang",
+            "command -v bash"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "creating /bin/bash by hand"
+          ],
+          "expected_completion_evidence": [
+            "portable shebang and a successful run"
+          ]
+        },
+        {
+          "kind": "negative",
+          "prompt": "Write a Dockerfile for the Node.js app.",
+          "expected_selected": [],
+          "expected_excluded": [
+            "portable-shell"
+          ],
+          "expected_initial_tools": [],
+          "unavailable_or_forbidden_tools": [],
+          "expected_completion_evidence": [
+            "Dockerfile"
+          ]
+        },
+        {
+          "kind": "ambiguous",
+          "prompt": "Make the deploy script run on both Ubuntu and macOS CI runners and prove it.",
+          "expected_selected": [
+            "portable-shell",
+            "fast-checks"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "find GNU-only flags in the script"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "claiming macOS support without a macOS run"
+          ],
+          "expected_completion_evidence": [
+            "passing runs on both runners, or the untested target named"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "security-boundaries",
+      "cases": [
+        {
+          "kind": "positive",
+          "prompt": "Give the deployment service an API token so it can call the billing API.",
+          "expected_selected": [
+            "security-boundary-review"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "existing credential channel"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "token in source, derivation or process arguments"
+          ],
+          "expected_completion_evidence": [
+            "negative test for a missing token"
+          ]
+        },
+        {
+          "kind": "positive",
+          "prompt": "Prepare this private repository for publication on GitHub.",
+          "expected_selected": [
+            "security-boundary-review"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "git ls-files inventory",
+            "secret scan of tree and history"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "changing visibility without authorization"
+          ],
+          "expected_completion_evidence": [
+            "coverage and findings report"
+          ]
+        },
+        {
+          "kind": "negative",
+          "prompt": "Fix the CSS alignment of the footer.",
+          "expected_selected": [],
+          "expected_excluded": [
+            "security-boundary-review"
+          ],
+          "expected_initial_tools": [],
+          "unavailable_or_forbidden_tools": [],
+          "expected_completion_evidence": [
+            "aligned footer"
+          ]
+        },
+        {
+          "kind": "ambiguous",
+          "prompt": "The agent sandbox blocks access to the package registry; should the egress allowlist be widened?",
+          "expected_selected": [
+            "security-boundary-review",
+            "capability-incident-diagnoser"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "exact denial and current allowlist"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "widening egress without authorization"
+          ],
+          "expected_completion_evidence": [
+            "narrowest proposed allowlist change"
+          ]
+        }
+      ]
+    }
+  ]
+}

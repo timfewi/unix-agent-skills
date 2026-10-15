@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "checks": [
+    {
+      "name": "nix-format",
+      "argv": ["nixfmt", "--check", "flake.nix"],
+      "requires": ["nixfmt"],
+      "timeout_seconds": 60,
+      "profiles": ["fast"]
+    },
+    {
+      "name": "statix",
+      "argv": ["statix", "check", "."],
+      "requires": ["statix"],
+      "timeout_seconds": 120,
+      "profiles": ["fast"]
+    },
+    {
+      "name": "deadnix",
+      "argv": ["deadnix", "--fail", "."],
+      "requires": ["deadnix"],
+      "timeout_seconds": 120,
+      "profiles": ["fast"]
+    },
+    {
+      "name": "skills-validate",
+      "argv": ["python3", "scripts/validate.py"],
+      "requires": ["python3"],
+      "timeout_seconds": 120,
+      "profiles": ["fast"]
+    },
+    {
+      "name": "python-tests",
+      "argv": ["python3", "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py"],
+      "requires": ["python3"],
+      "timeout_seconds": 120,
+      "profiles": ["fast"]
+    },
+    {
+      "name": "python-lint",
+      "argv": ["ruff", "check", "scripts", "tests"],
+      "requires": ["ruff"],
+      "timeout_seconds": 120,
+      "profiles": ["fast"]
+    },
+    {
+      "name": "python-format",
+      "argv": ["ruff", "format", "--check", "scripts", "tests"],
+      "requires": ["ruff"],
+      "timeout_seconds": 120,
+      "profiles": ["fast"]
+    },
+    {
+      "name": "shellcheck",
+      "argv": ["sh", "-c", "shellcheck skills/*/*/scripts/*.sh"],
+      "requires": ["sh", "shellcheck"],
+      "timeout_seconds": 60,
+      "profiles": ["fast"]
+    },
+    {
+      "name": "flake-eval",
+      "argv": ["nix", "flake", "check", "--all-systems", "--no-build", "--no-write-lock-file", "."],
+      "requires": ["nix"],
+      "timeout_seconds": 600,
+      "profiles": ["full"]
+    },
+    {
+      "name": "catalog-build",
+      "argv": ["nix", "build", "--no-link", "--no-write-lock-file", ".#checks.x86_64-linux.catalog"],
+      "requires": ["nix"],
+      "timeout_seconds": 600,
+      "profiles": ["full"]
+    }
+  ],
+  "watch_ignore": [".direnv", "result", "result-*", "__pycache__"]
+}
