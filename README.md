@@ -45,15 +45,16 @@ Each skill does one job, stands alone and is short enough to load whole.
 
 ## Install
 
-With Nix, `packages.<system>.skills` is a flat directory of all skills, and
-`lib.skills` maps each name to its directory so a consumer can select
-individual skills:
+With Nix, `lib.skills` maps each skill name to its directory, and
+`packages.<system>.skills` is a flat directory of all skills. Prefer the map
+in modules: listing the package during evaluation imports from a derivation.
 
 ```nix
-# Any option or module that installs a directory of skills, for example:
-skillsDirectory = inputs.unix-agent-skills.packages.${system}.skills;
+skills = inputs.unix-agent-skills.lib.skills;
 # or pick some:
 selected = { inherit (inputs.unix-agent-skills.lib.skills) tool-use lean-code; };
+# a built directory, for tools that read it at build or run time:
+skillsDirectory = inputs.unix-agent-skills.packages.${system}.skills;
 ```
 
 Without Nix, link each skill directory into the harness's skill directory, for
