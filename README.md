@@ -95,6 +95,17 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 nix flake check --no-build  # evaluates all three systems
 ```
 
+## Support
+
+Created and maintained by Tim Witter. If these skills save you time, please
+consider starring the repository, sharing it with attribution, or supporting
+its maintenance. Companies benefiting from this project are especially welcome
+to sponsor continued development. Financial support is appreciated, never
+required.
+
+For sponsorship or support inquiries, contact
+[hello@timwitter.com](mailto:hello@timwitter.com).
+
 ## Status
 
 2026-10-16: 14 skills in five domains, 40 routing cases. The validator, its
@@ -103,5 +114,5 @@ pass. The macOS paths of `proc-snapshot.sh` and the macOS forms in
 `portable-shell` have not been run on macOS. No model comparison has been run
 for the rewritten skills yet. A tracked privacy scan reports only the synthetic
 `/home/alice` fixture in `tests/test_validate.py`; the skills pass the
-validator's private-term check. The repository is private; publication needs
-a separate review.
+validator's private-term check. The repository is public following a review of
+the tracked files, Git history and repository publication surfaces.
