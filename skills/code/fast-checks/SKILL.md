@@ -10,13 +10,18 @@ declared commands. Find them in the agent instructions, README or CONTRIBUTING,
 then `justfile`, `Makefile`, package scripts or the CI workflow; CI shows which
 checks the project actually trusts. Do not invent a new gate.
 
-1. Run the fast gate (lint, format check, type check, unit tests) for the
-   touched area.
-2. Add the nearest meaningful regression or interaction check: a focused test,
-   one CLI invocation or one request that exercises the changed path.
-3. Broaden to full builds, full suites, VM or integration tests only when
-   requested, when the change crosses their boundary, or when focused evidence
-   is inconclusive. Respect the host's workload limits before launching them.
+Verification is proportionate, not minimal.
+
+1. Always run the repository's fast gate (lint, format check, type check, unit
+   tests), or its declared equivalent.
+2. When the change affects build output, packaging or runtime behavior, also
+   run the relevant build or test command, or start the application and
+   exercise the changed path: a focused test, one CLI invocation or one
+   request. Stay within the host's resource limits.
+3. Short-lived development or preview servers are allowed for this; stop them
+   before finishing and report how they were run.
+4. Heavy workloads (full system builds, VM tests, model runs, benchmarks, full
+   suites) require an explicit request.
 
 Entering a development shell provides an environment; it is not a test.
 Run one check per repository at a time and keep its process handle. Reuse a
