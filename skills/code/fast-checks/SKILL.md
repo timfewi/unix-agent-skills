@@ -20,8 +20,8 @@ Verification is proportionate, not minimal.
    request. Stay within the host's resource limits.
 3. Short-lived development or preview servers are allowed for this; stop them
    before finishing and report how they were run.
-4. Heavy workloads (full system builds, VM tests, model runs, benchmarks, full
-   suites) require an explicit request.
+4. Heavy workloads (full system builds, VM tests, model runs, benchmarks)
+   require an explicit request.
 
 Entering a development shell provides an environment; it is not a test.
 Run one check per repository at a time and keep its process handle. Reuse a
