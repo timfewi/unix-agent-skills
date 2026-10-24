@@ -80,6 +80,35 @@ class ValidateTest(unittest.TestCase):
         self.assertEqual(sorted(skills), ["one-skill", "two-skill"])
         self.assertEqual(cases, 4)
 
+    def test_native_invocation_policy_is_supported_and_linked(self):
+        directory = self.write_skill(
+            "alpha", "one-skill", "See [native policy](agents/openai.yaml)."
+        )
+        (directory / "agents").mkdir()
+        policy = directory / "agents/openai.yaml"
+        policy.write_text("policy:\n  allow_implicit_invocation: false\n")
+        self.assertEqual(self.errors(), [])
+        self.write_skill("alpha", "one-skill", "Plain guidance.")
+        self.assertError("orphan")
+
+    def test_native_policy_rejects_ambiguous_values_and_other_metadata(self):
+        directory = self.write_skill(
+            "alpha", "one-skill", "See [native policy](agents/openai.yaml)."
+        )
+        (directory / "agents").mkdir()
+        policy = directory / "agents/openai.yaml"
+        for value in (
+            "policy:\n  allow_implicit_invocation: 'false'\n",
+            "policy:\n  allow_implicit_invocation: false\n  allow_implicit_invocation: true\n",
+            "policy:\n  allow_implicit_invocation: false\ndependencies: {}\n",
+        ):
+            with self.subTest(value=value):
+                policy.write_text(value)
+                self.assertError("invocation-policy")
+        policy.write_text("policy:\n  allow_implicit_invocation: false\n")
+        (directory / "agents/other.yaml").write_text("other: true\n")
+        self.assertError("layout")
+
     def test_mentioning_another_skill_breaks_isolation(self):
         self.write_skill("alpha", "one-skill", "Then load two-skill.")
         self.assertError("isolation")

@@ -38,6 +38,11 @@ Each skill does one job, stands alone and is short enough to load whole.
   `assets/*.{md,txt,json}`, each linked from `SKILL.md`. Scripts are read-only
   helpers, declare their interpreters in `compatibility`, and are tested for
   success and failure.
+- **Invocation policy.** Optional, linked `agents/openai.yaml` supports only
+  `policy:` followed by `  allow_implicit_invocation: false` (or `true`). It
+  controls native Codex discovery; other harnesses may ignore it. Explicit-only
+  skills must also state their activation condition in the entrypoint. Extra
+  metadata fields require a deliberate validator extension.
 - **Evidence.** Every skill is selected by at least one positive case in
   [tests/routing_cases.json](tests/routing_cases.json); each group also has a
   negative and an ambiguous case. These are rubrics; the validator does not run

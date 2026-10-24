@@ -17,8 +17,9 @@ RESOURCE_SUFFIXES = {
     "references": {".md"},
     "scripts": {".py", ".sh"},
     "assets": {".md", ".txt", ".json"},
+    "agents": {".yaml"},
 }
-RESOURCE_MENTION_RE = re.compile(r"(?:references|scripts|assets)/[\w.-]+\.\w+")
+RESOURCE_MENTION_RE = re.compile(r"(?:references|scripts|assets|agents)/[\w.-]+\.\w+")
 LINK_RE = re.compile(r"\]\(([^)\s]+)\)")
 HOME_RE = re.compile(r"/(?:home|Users)/(?!user\b)[A-Za-z0-9_][\w.-]*")
 PLACEHOLDER_RE = re.compile(r"\b(?:TODO|TBD|FIXME|CHANGEME)\b|\{\{[^}\n]+\}\}")
@@ -87,7 +88,11 @@ def resource_files(skill: Path, errors: list[str]) -> list[Path]:
                 errors.append(f"{path}: layout: unexpected directory")
         elif relative.as_posix() != "SKILL.md":
             allowed = RESOURCE_SUFFIXES.get(relative.parts[0], set())
-            if len(relative.parts) != 2 or path.suffix not in allowed:
+            if (
+                len(relative.parts) != 2
+                or path.suffix not in allowed
+                or (relative.parts[0] == "agents" and relative.name != "openai.yaml")
+            ):
                 errors.append(f"{path}: layout: unexpected resource")
             else:
                 files.append(path)
@@ -127,6 +132,14 @@ def check_skill(
             errors.append(f"{path}: encoding: must be readable UTF-8")
             continue
         errors += check_text(path, texts[path], others, deny)
+        if path.relative_to(
+            skill
+        ).as_posix() == "agents/openai.yaml" and not re.fullmatch(
+            r"policy:\n  allow_implicit_invocation: (?:true|false)\n?", texts[path]
+        ):
+            errors.append(
+                f"{path}: invocation-policy: expected one literal boolean policy"
+            )
         for target in LINK_RE.findall(texts[path]):
             if re.match(r"[a-z]+:|#", target):
                 continue
