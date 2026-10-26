@@ -12,8 +12,12 @@ checks the project actually trusts. Do not invent a new gate.
 
 Verification is proportionate, not minimal.
 
-1. Always run the repository's fast gate (lint, format check, type check, unit
-   tests), or its declared equivalent.
+For read-only investigation, gather the evidence needed for the question;
+unrelated code checks add no evidence. External planning documents need source
+and acceptance review, while repository documentation uses its owning checks.
+
+1. For code or configuration changes, run the repository's fast gate (lint,
+   format check, type check, unit tests), or its declared equivalent.
 2. When the change affects build output, packaging or runtime behavior, also
    run the relevant build or test command, or start the application and
    exercise the changed path: a focused test, one CLI invocation or one

@@ -220,6 +220,24 @@
       "id": "checks-vs-test-freshness",
       "cases": [
         {
+          "kind": "negative",
+          "prompt": "Inspect the profile selection and explain which skills are currently installed. Do not change any files.",
+          "expected_selected": [],
+          "expected_excluded": ["fast-checks", "test-freshness"],
+          "expected_initial_tools": ["read the profile and selected skill sources"],
+          "unavailable_or_forbidden_tools": ["running unrelated code checks"],
+          "expected_completion_evidence": ["source-backed inventory with unexercised runtime behavior identified"]
+        },
+        {
+          "kind": "negative",
+          "prompt": "Review an external migration plan against its cited sources and acceptance criteria without changing repository code.",
+          "expected_selected": [],
+          "expected_excluded": ["fast-checks", "test-freshness"],
+          "expected_initial_tools": ["read the plan and its factual sources"],
+          "unavailable_or_forbidden_tools": ["running a repository code gate for the external document"],
+          "expected_completion_evidence": ["review of sources, assumptions and acceptance criteria"]
+        },
+        {
           "kind": "positive",
           "prompt": "Which checks should run after changing the CLI argument parser?",
           "expected_selected": [
