@@ -8,11 +8,13 @@ description: Choose the tool that answers a concrete evidence question and run m
 Name the missing evidence first; supplied context may already answer it.
 Read a known file directly instead of rediscovering it. A tool listed in a
 catalog is not proof that it is available: check the live schema or `--help`.
+Use the environment's prescribed runtime launcher even when another interpreter
+is on PATH; probe the command through that launcher.
 
 | Question | First route |
 | --- | --- |
 | What changed? | `git status --short`, `git diff --stat`, then a scoped diff |
-| Which fields in JSON/YAML? | `jq` projection; `yq` or a real parser otherwise |
+| Which structured values? | `jq`/`yq` projection or a selected runtime's parser; Python's standard library can query JSON/CSV without dependencies |
 | Does this change work? | The repository's declared fast check, then a focused behavior check |
 | What does this CLI accept? | Installed `--help` before composing the call |
 | What does this library do now? | Version-matched documentation, not memory |
@@ -24,6 +26,8 @@ catalog is not proof that it is available: check the live schema or `--help`.
 - Shape output to the question: counts or paths first (`rg -c`, `rg -l`,
   `--stat`), then specific lines. Bound at the source (`head`, `sed -n`,
   `--max-count`) or write long output to a file and read the relevant range.
+  Budget the combined batch output: per-call limits multiply. On truncation,
+  narrow the projection or range instead of repeating the same dump.
 - Run non-interactively: disable pagers and color (`GIT_PAGER=cat`,
   `NO_COLOR=1`, `--no-pager`), pass `-y`/`--yes` only for actions already
   authorized, and avoid commands that wait for a TTY.

@@ -101,6 +101,62 @@
           ]
         },
         {
+          "kind": "positive",
+          "prompt": "In this multi-repository workspace, find which checkout owns the release tooling and which shared instructions apply.",
+          "expected_selected": [
+            "filesystem-wizard"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "available read-only workspace inventory",
+            "reported repository guides"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "searching contents of every checkout before selecting an owner"
+          ],
+          "expected_completion_evidence": [
+            "owning checkout, instruction paths and a search scoped to that checkout"
+          ]
+        },
+        {
+          "kind": "positive",
+          "prompt": "The owner repository is known, but default rg found no matches. Locate the setting under its hidden .config directory without searching generated dependencies.",
+          "expected_selected": [
+            "filesystem-wizard"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "ignore-rule inspection",
+            "scoped hidden-file search excluding .git and caches"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "treating default rg absence as proof",
+            "unbounded no-ignore search"
+          ],
+          "expected_completion_evidence": [
+            "source path and relevant lines, with search coverage stated"
+          ]
+        },
+        {
+          "kind": "positive",
+          "prompt": "Count enabled entries by kind in two supplied JSON files. Python is already available in the selected environment; show only counts and source names.",
+          "expected_selected": [
+            "tool-use"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "standard-library JSON projection of the supplied files"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "grep-based field counting",
+            "recursive repository search",
+            "dumping complete documents"
+          ],
+          "expected_completion_evidence": [
+            "counts grouped by kind and input paths"
+          ]
+        },
+        {
           "kind": "negative",
           "prompt": "Explain the policy excerpt that was already quoted earlier in this conversation.",
           "expected_selected": [],
