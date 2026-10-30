@@ -3,7 +3,7 @@
   "checks": [
     {
       "name": "nix-format",
-      "argv": ["nixfmt", "--check", "flake.nix"],
+      "argv": ["nixfmt", "--check", "flake.nix", "devenv.nix"],
       "requires": ["nixfmt"],
       "timeout_seconds": 60,
       "profiles": ["fast"]
@@ -72,5 +72,5 @@
       "profiles": ["full"]
     }
   ],
-  "watch_ignore": [".direnv", "result", "result-*", "__pycache__"]
+  "watch_ignore": [".devenv", ".direnv", "result", "result-*", "__pycache__"]
 }

@@ -93,7 +93,7 @@ python3 scripts/validate.py --deny-file ~/path/to/private-terms.txt
 ## Development
 
 ```sh
-nix develop                 # python3, ruff, shellcheck, nixfmt, statix, deadnix
+devenv shell                 # python3, ruff, shellcheck, nixfmt, statix, deadnix
 project-check fast          # or run the commands below directly
 python3 scripts/validate.py
 python3 -m unittest discover -s tests -p 'test_*.py'

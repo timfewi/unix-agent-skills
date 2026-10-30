@@ -6,7 +6,7 @@ the layout or the validator.
 - Skills live in `skills/<domain>/<skill>/`. A skill never names another skill
   or repository and never links outside its directory; `scripts/validate.py`
   enforces this. Personal or machine-specific skills belong in the private
-  overlay `../unix-agent-skills-private`, never in a project or host
+  catalog `../private-skills-catalog`, never in a project or host
   repository: keep this catalog publishable.
 - Edit the smallest thing that fixes an observed problem. Before adding a
   skill, check whether an existing one should absorb the job. Update

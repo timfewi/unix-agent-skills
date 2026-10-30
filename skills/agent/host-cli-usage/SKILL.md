@@ -1,6 +1,6 @@
 ---
 name: host-cli-usage
-description: Resolve the installed syntax of a command-line tool before invoking it or retrying an argument error. Use when running an unfamiliar CLI, after "unknown option" or "unexpected argument" errors, or when translating an MCP/API operation into a shell command.
+description: Resolve the installed syntax of a command-line tool before invoking it or retrying an argument error. Use when running an unfamiliar CLI, after "unknown option" or "unexpected argument" errors, when a project environment (direnv `.envrc`, devenv, `nix develop`) is not loaded, or when translating an MCP/API operation into a shell command.
 ---
 
 # Installed command syntax
@@ -29,5 +29,14 @@ banner, assume the BSD variant and check its man page.
 When a command is missing, look for a wrapper or toolbox the host documents
 before declaring it unavailable. Do not install replacements or change the
 system to obtain a command unless that is part of the task.
+
+Non-interactive agent shells do not load interactive environment hooks.
+When execution is authorized, enter the environment per command
+(`devenv shell -- <cmd>`, `nix develop -c <cmd>`, or legacy
+`direnv exec <dir> <cmd>`). An unapproved automatic hook neither grants
+manual execution nor by itself forbids it: check the applicable permission
+first and never bypass an explicit denial. Automatic trust (`devenv allow`,
+legacy `direnv allow`) permits recurring code execution; leave that
+decision to the owner after review.
 
 Return the exact invocation, its exit status and the relevant output.

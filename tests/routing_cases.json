@@ -65,6 +65,25 @@
       "cases": [
         {
           "kind": "positive",
+          "prompt": "Which configuration option enables the SSH server, and what default applies in this project's pinned package set? A package/option index MCP is exposed.",
+          "expected_selected": [
+            "tool-use"
+          ],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "package/option index lookup",
+            "pinned source or evaluation check"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "answering from memory",
+            "treating the index channel as the pinned revision"
+          ],
+          "expected_completion_evidence": [
+            "option name with the evidence level reached"
+          ]
+        },
+        {
+          "kind": "positive",
           "prompt": "Explain the release protocol in docs/RELEASE.md; the repository and path are known.",
           "expected_selected": [
             "tool-use"
@@ -196,6 +215,27 @@
     {
       "id": "cli-syntax-vs-capability-incident",
       "cases": [
+        {
+          "kind": "ambiguous",
+          "prompt": "`just check` reports command not found although the repository's .envrc provides it, and `direnv exec . just check` says the .envrc is blocked.",
+          "expected_selected": [
+            "host-cli-usage"
+          ],
+          "expected_excluded": [
+            "capability-incident-diagnoser"
+          ],
+          "expected_initial_tools": [
+            "check whether explicit environment execution is authorized before choosing an entry command"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "direnv allow or devenv allow by the agent",
+            "using explicit environment entry to bypass an explicit execution denial",
+            "installing just"
+          ],
+          "expected_completion_evidence": [
+            "manual-entry permission checked and the command run only if authorized, or the specific approval/denial blocker reported"
+          ]
+        },
         {
           "kind": "positive",
           "prompt": "`ast-index search --query Config` failed with \"unexpected argument '--query' found\".",

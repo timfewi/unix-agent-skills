@@ -6,8 +6,8 @@ description: Choose the tool that answers a concrete evidence question and run m
 # Efficient tool use
 
 Name the missing evidence first; supplied context may already answer it.
-Read a known file directly instead of rediscovering it. A tool listed in a
-catalog is not proof that it is available: check the live schema or `--help`.
+Read a known file directly instead of rediscovering it. A listed tool may be
+unavailable: check the live schema or `--help`.
 Use the environment's prescribed runtime launcher even when another interpreter
 is on PATH; probe the command through that launcher.
 
@@ -18,6 +18,7 @@ is on PATH; probe the command through that launcher.
 | Does this change work? | The repository's declared fast check, then a focused behavior check |
 | What does this CLI accept? | Installed `--help` before composing the call |
 | What does this library do now? | Version-matched documentation, not memory |
+| Which package or config option? | An exposed package/option index, then the project's pinned source or evaluation |
 
 ## Run calls well
 
