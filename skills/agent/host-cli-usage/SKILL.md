@@ -1,42 +1,35 @@
 ---
 name: host-cli-usage
-description: Resolve the installed syntax of a command-line tool before invoking it or retrying an argument error. Use when running an unfamiliar CLI, after "unknown option" or "unexpected argument" errors, when a project environment (direnv `.envrc`, devenv, `nix develop`) is not loaded, or when translating an MCP/API operation into a shell command.
+description: Use for unfamiliar CLI syntax, rejected arguments, missing command environments, or translating an API operation into a shell invocation.
 ---
 
-# Installed command syntax
+# Resolve the installed contract
 
-The installed binary is authoritative. A README, blog post, MCP schema or your
-memory may describe another version.
+Use installed help for the command and relevant subcommand; an API schema or
+remembered example may describe a different interface. Inspect `command -v`
+or `type -a` when aliases, wrappers, or multiple versions could explain the
+result. Use the prescribed launcher, not an unwrapped substitute.
 
-1. **Identify the binary.** `command -v <tool>` (or `type -a <tool>` to see
-   shadowing aliases and functions), then `<tool> --version`.
-2. **Read installed help.** `<tool> --help`, then `<tool> <subcommand> --help`.
-   Fall back to `<tool> help <subcommand>`, `man <tool>` with `MANPAGER=cat`,
-   or `-h`. Shell builtins use `help <name>` (bash) or `man zshbuiltins`.
-3. **Map, do not copy.** MCP or API field names (`query`, `file`, `limit`) are
-   often positional arguments or differently named flags on the CLI.
-4. **Probe once.** Confirm one small real invocation before composing a
-   pipeline or loop around it.
+After an argument rejection, correct the invocation from help or the manual
+instead of guessing flag spellings. API fields may become positional
+arguments. Confirm an unfamiliar mapping with a small, authorized invocation
+before multiplying it in a loop. Do not repeat probes for a known contract.
 
-After an argument or subcommand rejection, read help before retrying; never
-cycle through guessed flag spellings. An empty result or an ambiguity message
-is an answer to interpret, not an error to retry.
+GNU, BSD, BusyBox, and wrapper commands can share a name. A missing GNU
+banner or rejected `--version` does not identify BSD. Check available flags
+and the actual executable; the operating system alone does not determine
+the userland.
 
-Same name, different tool: GNU and BSD/macOS userlands differ (`sed -i`,
-`date`, `stat`, `grep -P`). If `<tool> --version` fails or prints no GNU
-banner, assume the BSD variant and check its man page.
+## Missing environments
 
-When a command is missing, look for a wrapper or toolbox the host documents
-before declaring it unavailable. Do not install replacements or change the
-system to obtain a command unless that is part of the task.
+Non-interactive shells may lack interactive environment hooks. Check the
+documented wrapper or project environment before declaring a tool absent.
+Where authorized, use the declared per-command environment entrypoint.
 
-Non-interactive agent shells do not load interactive environment hooks.
-When execution is authorized, enter the environment per command
-(`devenv shell -- <cmd>`, `nix develop -c <cmd>`, or legacy
-`direnv exec <dir> <cmd>`). An unapproved automatic hook neither grants
-manual execution nor by itself forbids it: check the applicable permission
-first and never bypass an explicit denial. Automatic trust (`devenv allow`,
-legacy `direnv allow`) permits recurring code execution; leave that
-decision to the owner after review.
+An unapproved automatic hook is not necessarily a denial of manual
+execution, but neither grants permission. Never use manual entry to bypass
+an explicit denial. Installing replacements, changing the system, or trusting
+recurring hooks requires the applicable authorization.
 
-Return the exact invocation, its exit status and the relevant output.
+Distinguish an empty result from invocation failure. Return the working
+invocation and decisive result, or the specific environment or approval gap.

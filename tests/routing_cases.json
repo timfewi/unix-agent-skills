@@ -7,17 +7,32 @@
       "cases": [
         {
           "kind": "positive",
+          "prompt": "Resume the refactor. The harness already supplies a current checkpoint, unchanged source revisions, passing check results, and a live job handle.",
+          "expected_selected": ["context-management"],
+          "expected_excluded": [],
+          "expected_initial_tools": [],
+          "unavailable_or_forbidden_tools": [
+            "creating a parallel memory store or checkpoint file",
+            "rerunning checks solely because the session resumed",
+            "restarting the job whose handle is already supplied"
+          ],
+          "expected_completion_evidence": [
+            "reuse of the supplied state and valid checks, with only missing or changed evidence recovered"
+          ]
+        },
+        {
+          "kind": "positive",
           "prompt": "Resume yesterday's half-finished migration. The earlier session's file excerpts and test results are in the transcript.",
           "expected_selected": [
             "context-management"
           ],
           "expected_excluded": [],
           "expected_initial_tools": [
-            "recheck changed files",
-            "rerun the last relevant check"
+            "compare saved evidence with current inputs",
+            "rerun relevant checks only where inputs or assumptions changed"
           ],
           "unavailable_or_forbidden_tools": [
-            "reasoning from the old test result"
+            "relying on an old test result without establishing that its inputs and assumptions remain valid"
           ],
           "expected_completion_evidence": [
             "checkpoint with current evidence and next action"
@@ -83,19 +98,16 @@
           ]
         },
         {
-          "kind": "positive",
-          "prompt": "Explain the release protocol in docs/RELEASE.md; the repository and path are known.",
-          "expected_selected": [
-            "tool-use"
-          ],
-          "expected_excluded": [
-            "filesystem-wizard"
-          ],
+          "kind": "negative",
+          "prompt": "Explain the release protocol in docs/RELEASE.md; the repository, path, and ordinary file-read operation are known.",
+          "expected_selected": [],
+          "expected_excluded": ["filesystem-wizard", "tool-use"],
           "expected_initial_tools": [
             "bounded read of docs/RELEASE.md"
           ],
           "unavailable_or_forbidden_tools": [
-            "repository-wide search for the known file"
+            "repository-wide search for the known file",
+            "loading generic tool-selection guidance for an established read"
           ],
           "expected_completion_evidence": [
             "the relevant protocol excerpt"
@@ -216,6 +228,49 @@
       "id": "cli-syntax-vs-capability-incident",
       "cases": [
         {
+          "kind": "positive",
+          "prompt": "A container's sed rejects --version. Determine which flags this installed command supports; do not assume it is BSD sed.",
+          "expected_selected": ["host-cli-usage", "portable-shell"],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "installed executable, help or manual inspection"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "inferring BSD solely from a rejected GNU flag",
+            "installing a replacement"
+          ],
+          "expected_completion_evidence": [
+            "supported syntax grounded in the actual utility or an explicit unresolved variant"
+          ]
+        },
+        {
+          "kind": "positive",
+          "prompt": "An MCP operation returns EACCES without identifying an enforcing layer. Diagnose whether this is an OS permission or a sandbox policy.",
+          "expected_selected": ["capability-incident-diagnoser"],
+          "expected_excluded": [],
+          "expected_initial_tools": [
+            "structured error metadata and bounded boundary diagnostics"
+          ],
+          "unavailable_or_forbidden_tools": [
+            "claiming EACCES proves a sandbox denial",
+            "bypassing the failed operation"
+          ],
+          "expected_completion_evidence": [
+            "supported cause or explicit uncertainty about the enforcing layer"
+          ]
+        },
+        {
+          "kind": "negative",
+          "prompt": "Run the same already validated, authorized CLI command with the next input file; its binary and argument contract have not changed.",
+          "expected_selected": [],
+          "expected_excluded": ["host-cli-usage", "capability-incident-diagnoser"],
+          "expected_initial_tools": ["the established command with the new input"],
+          "unavailable_or_forbidden_tools": [
+            "repeating version and help probes without a changed assumption"
+          ],
+          "expected_completion_evidence": ["the command result for the new input"]
+        },
+        {
           "kind": "ambiguous",
           "prompt": "`just check` reports command not found although the repository's .envrc provides it, and `direnv exec . just check` says the .envrc is blocked.",
           "expected_selected": [
@@ -316,6 +371,19 @@
       "id": "checks-vs-test-freshness",
       "cases": [
         {
+          "kind": "positive",
+          "prompt": "The declared fast gate just passed and already exercised the changed CLI path. Sources and environment are unchanged. Is another identical smoke run needed?",
+          "expected_selected": ["fast-checks"],
+          "expected_excluded": [],
+          "expected_initial_tools": ["inspect the existing check's coverage and result"],
+          "unavailable_or_forbidden_tools": [
+            "rerunning identical coverage merely to satisfy a second checklist item"
+          ],
+          "expected_completion_evidence": [
+            "reuse of the current gate result, with any genuinely missing coverage identified"
+          ]
+        },
+        {
           "kind": "negative",
           "prompt": "Inspect the profile selection and explain which skills are currently installed. Do not change any files.",
           "expected_selected": [],
@@ -405,6 +473,18 @@
       "id": "lean-code-boundaries",
       "cases": [
         {
+          "kind": "negative",
+          "prompt": "Apply the configured formatter to this file; no refactoring or architectural change is requested.",
+          "expected_selected": [],
+          "expected_excluded": ["lean-code"],
+          "expected_initial_tools": ["the authorized formatter scoped to the file"],
+          "unavailable_or_forbidden_tools": [
+            "introducing a code-simplification loop",
+            "changing interfaces or extracting helpers"
+          ],
+          "expected_completion_evidence": ["formatting-only diff"]
+        },
+        {
           "kind": "positive",
           "prompt": "Simplify the duplicated retry helpers in client.py and server.py without changing behavior.",
           "expected_selected": [
@@ -460,6 +540,22 @@
       "cases": [
         {
           "kind": "positive",
+          "prompt": "The reviewed change and all required checks are current. Commit locally under the existing grant, read back the commit, then update the existing task tracker. Do not push.",
+          "expected_selected": ["finalize-loop", "brokered-git-operator"],
+          "expected_excluded": [],
+          "expected_initial_tools": ["confirm intended staged content and current verification"],
+          "unavailable_or_forbidden_tools": [
+            "asking again for the already granted local commit",
+            "pushing",
+            "rerunning unchanged checks",
+            "requiring the read-back to be the last tool call"
+          ],
+          "expected_completion_evidence": [
+            "local commit identity and authoritative read-back, followed by a consistent tracker update"
+          ]
+        },
+        {
+          "kind": "positive",
           "prompt": "The feature is implemented. Wrap it up: review, verify and commit it.",
           "expected_selected": [
             "finalize-loop"
@@ -470,7 +566,7 @@
             "full diff"
           ],
           "unavailable_or_forbidden_tools": [
-            "ending with a prose claim instead of a read-back"
+            "claiming completion without authoritative read-back evidence"
           ],
           "expected_completion_evidence": [
             "git log -1 read-back after the commit"
@@ -537,6 +633,21 @@
     {
       "id": "process-vs-shell",
       "cases": [
+        {
+          "kind": "positive",
+          "prompt": "The authorized service PID is known. One snapshot shows state R, but there is no sustained CPU measurement. Diagnose without inspecting unrelated processes or restarting the unit.",
+          "expected_selected": ["process-debugging"],
+          "expected_excluded": [],
+          "expected_initial_tools": ["bounded observations of the specified process over time"],
+          "unavailable_or_forbidden_tools": [
+            "treating one R sample as proof of a CPU bottleneck",
+            "inspecting unrelated process trees",
+            "attaching a disruptive debugger or restarting without authority"
+          ],
+          "expected_completion_evidence": [
+            "observations separated from the bottleneck hypothesis, with any unexercised probes identified"
+          ]
+        },
         {
           "kind": "positive",
           "prompt": "The dev server hangs at 100% CPU and port 3000 stays in use after Ctrl+C.",
@@ -609,6 +720,20 @@
     {
       "id": "shell-portability",
       "cases": [
+        {
+          "kind": "positive",
+          "prompt": "A shell script treats grep finding no match as an expected result. Preserve that behavior across supported shells instead of blindly adding set -e.",
+          "expected_selected": ["portable-shell"],
+          "expected_excluded": [],
+          "expected_initial_tools": ["inspect the expected nonzero status and its control-flow context"],
+          "unavailable_or_forbidden_tools": [
+            "adding strict-mode flags without checking their effect",
+            "discarding unexpected failures along with the expected status"
+          ],
+          "expected_completion_evidence": [
+            "expected no-match behavior and genuine errors handled distinctly on tested shells"
+          ]
+        },
         {
           "kind": "positive",
           "prompt": "In zsh, `for f in $files; do wc -l $f; done` treats all names as one argument.",
@@ -685,6 +810,21 @@
       "cases": [
         {
           "kind": "positive",
+          "prompt": "A new model is advertised as safe enough to remove the credential and egress checks from an agent wrapper. Review that proposal without changing permissions.",
+          "expected_selected": ["security-boundary-review"],
+          "expected_excluded": [],
+          "expected_initial_tools": ["identify the protected resources and actual enforcement points"],
+          "unavailable_or_forbidden_tools": [
+            "treating model capability or vendor claims as authorization",
+            "weakening OS or service boundaries",
+            "reading live credentials"
+          ],
+          "expected_completion_evidence": [
+            "model guidance distinguished from enforceable controls, with unchanged permissions"
+          ]
+        },
+        {
+          "kind": "positive",
           "prompt": "Give the deployment service an API token so it can call the billing API.",
           "expected_selected": [
             "security-boundary-review"
@@ -756,6 +896,21 @@
       "cases": [
         {
           "kind": "positive",
+          "prompt": "Define a concise goal from the outcome, scope and exact acceptance command already provided. No plan, new progress file, or implementation is wanted.",
+          "expected_selected": ["goal-workflow"],
+          "expected_excluded": [],
+          "expected_initial_tools": [],
+          "unavailable_or_forbidden_tools": [
+            "repeating answered interview questions",
+            "inventing a plan, budget or progress file",
+            "starting implementation"
+          ],
+          "expected_completion_evidence": [
+            "a concise goal preserving the supplied outcome, boundaries and acceptance command"
+          ]
+        },
+        {
+          "kind": "positive",
           "prompt": "Help me turn my idea for faster repository search into a clear agent goal. Do not implement it yet.",
           "expected_selected": [
             "goal-workflow"
@@ -770,7 +925,7 @@
             "inventing a model or token budget"
           ],
           "expected_completion_evidence": [
-            "self-contained goal with outcome, context, work, boundaries and observable acceptance criteria"
+            "self-contained goal with outcome, evidence, boundaries and observable acceptance criteria"
           ]
         },
         {

@@ -1,43 +1,39 @@
 ---
 name: process-debugging
-description: Inspect and debug running processes and services on Linux or macOS (hangs, high CPU or memory, port already in use, zombies, crash loops, failing systemd or launchd units) with bounded, read-only evidence first. Use when a program misbehaves at runtime and the cause is in its process state, resources or service manager.
+description: Use for hangs, resource spikes, occupied ports, zombies, crash loops, or failing Linux/macOS services; start with bounded process evidence.
 compatibility: scripts/proc-snapshot.sh needs a POSIX sh, ps and pgrep; ss (Linux) or lsof add socket details.
 ---
 
-# Process debugging
+# Diagnose the process, not the symptom
 
-Observe before acting. Every probe is read-only and time-bounded.
+Identify the task-related PID or unit, its owner, and the observation interval.
+Start read-only and inspect only the relevant process tree. A snapshot is not
+a trend, and a busy process is not necessarily the bottleneck.
 
-1. **Find the process.**
-   - By name: `pgrep -af <name>` on Linux, `pgrep -lf <name>` on macOS.
-   - Top consumers: `ps -eo pid,ppid,stat,etime,%cpu,%mem,args --sort=-%cpu | head`
-     on Linux, `ps -Ao pid,ppid,stat,etime,%cpu,%mem,command -r | head` on macOS.
-   - By port: `ss -ltnp 'sport = :8080'` or `lsof -nP -iTCP:8080 -sTCP:LISTEN`.
-2. **Snapshot it.** Run `sh scripts/proc-snapshot.sh <pid>` from this skill
-   directory ([script](scripts/proc-snapshot.sh)). It prints the state, children,
-   memory, wait channel, cwd, fd count, limits, cgroup and sockets.
-3. **Read the state letter.**
-   - `R`: busy on CPU, so profile it.
-   - `S`: waiting; check the wait channel and sockets.
-   - `D`: uninterruptible I/O; signals will not help, so check disk and NFS.
-   - `Z`: zombie; the parent is not reaping it.
-   - `T`: stopped by a signal or debugger.
-4. **Go one level deeper only where the evidence points:**
-   - Hang: `timeout 10 strace -f -p <pid> -o <file>` (Linux; ptrace may be
-     restricted), `sample <pid> 5` (macOS), or py-spy/gdb if installed.
-   - CPU: `top -b -n 1 -H -p <pid>` (Linux) or `top -l 1 -pid <pid>` (macOS).
-   - Memory: compare two snapshots over time; for OOM kills check
-     `journalctl -k --since -1h --no-pager | grep -i oom`.
-   - Services: `systemctl status <unit> --no-pager`,
-     `journalctl -u <unit> -n 100 --no-pager` (add `--user` for user units);
-     on macOS `launchctl print gui/$(id -u)/<label>` and
-     `log show --last 10m --predicate 'process == "<name>"'`.
-5. **Bound everything.** Use `timeout` on Linux; macOS lacks it by default, so
-   use tool-native durations. Write traces to a file and read a summary.
+Useful entrypoints include `pgrep -af <name>` on Linux, `pgrep -lf <name>` on
+macOS, and a port-specific `ss` or `lsof` query. For a bounded baseline, run
+`sh scripts/proc-snapshot.sh <pid>` from this skill directory
+([script](scripts/proc-snapshot.sh)). Inspect and redact sensitive arguments
+or paths before sharing output.
 
-Signals and restarts change system state. Send them only to processes you
-started or were authorized to stop: `SIGTERM` first, wait, then `SIGKILL`.
-Never signal PID 1, the agent's own harness or another user's process.
-Restarting units is an availability change that needs authorization.
+| State | Next question |
+| --- | --- |
+| R | Sustained CPU work or just this sample? |
+| S | Which wait channel, socket, or child explains the wait? |
+| D | Blocked storage or NFS? Killing cannot resolve the I/O wait. |
+| Z | Why is the parent not reaping children? |
+| T | Which signal or debugger stopped it? |
 
-Report the PID, state, evidence and cause, marked confirmed or hypothesis.
+Follow the evidence: compare memory snapshots; inspect bounded service logs
+or OOM evidence; use thread views for CPU. `systemctl`/`journalctl` and
+`launchctl`/`log` have different scopes. A debugger or syscall trace can
+perturb or pause the target: attach only within permission and with a time
+limit. macOS often needs tool-native durations rather than `timeout`.
+
+Signals and restarts change availability. Signal only processes you started
+or are authorized to stop: terminate gracefully, wait, and escalate only if
+needed and authorized. Never signal PID 1, the agent's harness, or another
+user's process. Unit restarts need authorization.
+
+Report PID/unit, observed state, decisive evidence, and whether the cause is
+confirmed or a hypothesis.

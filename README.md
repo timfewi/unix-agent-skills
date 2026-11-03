@@ -6,11 +6,17 @@ Unix-like systems: Linux and macOS, bash and zsh, GNU and BSD userlands.
 
 Each skill does one job, stands alone and is short enough to load whole.
 
+The catalog assumes competent coding agents. Skills add narrow decision cues,
+Unix-specific pitfalls and evidence requirements rather than reteaching
+programming or imposing a universal sequence of steps. The harness owns
+tool routing, permissions and context or memory facilities; skills do not
+replace those controls or create parallel state stores.
+
 ## Domains
 
 | Domain | Skill | Use when |
 | --- | --- | --- |
-| `agent/` | `context-management` | a session resumes, compacts or fills with output |
+| `agent/` | `context-management` | a long task resumes, approaches compaction, or has stale evidence |
 | | `goal-workflow` | defining an agent goal or explicitly executing a previously defined goal |
 | | `tool-use` | choosing a tool for an evidence question and running calls efficiently |
 | | `host-cli-usage` | invoking an unfamiliar CLI or after an argument error |
@@ -20,7 +26,7 @@ Each skill does one job, stands alone and is short enough to load whole.
 | | `fast-checks` | choosing proportionate verification, or a check fails |
 | | `test-freshness` | tests may no longer detect the failure they guard |
 | `vcs/` | `brokered-git-operator` | an authorized commit, push or review request on any forge |
-| | `finalize-loop` | wrapping up a change: review, verify, judge, land, read back |
+| | `finalize-loop` | completed work needs final review, verification or handoff |
 | `security/` | `security-boundary-review` | credentials, permissions, sandboxes, egress or publication |
 | `system/` | `process-debugging` | a process hangs, burns CPU or memory, holds a port, or a unit fails |
 | | `portable-shell` | a script must run on Linux and macOS, or bash/zsh behave differently |
@@ -32,8 +38,9 @@ Each skill does one job, stands alone and is short enough to load whole.
   depend on each other. Names are unique across domains.
 - **Short.** The whole `SKILL.md` stays within 400 words (target 150–300).
   Detail that is needed only sometimes goes into a linked reference.
-- **Triggerable.** The `description` says what the skill does and contains
-  "Use when" or "Use for".
+- **Triggerable.** Front-load a concise, specific use case in `description`,
+  including "Use when" or "Use for". Avoid triggers that capture routine work
+  without adding useful guidance.
 - **Resources.** `references/*.md`, `scripts/*.{py,sh}` and
   `assets/*.{md,txt,json}`, each linked from `SKILL.md`. Scripts are read-only
   helpers, declare their interpreters in `compatibility`, and are tested for
@@ -113,11 +120,11 @@ For sponsorship or support inquiries, contact
 
 ## Status
 
-2026-10-16: 14 skills in five domains, 40 routing cases. The validator, its
-unit tests, the snapshot-script tests (Linux), ruff, shellcheck and Nix lint
-pass. The macOS paths of `proc-snapshot.sh` and the macOS forms in
-`portable-shell` have not been run on macOS. No model comparison has been run
-for the rewritten skills yet. A tracked privacy scan reports only the synthetic
-`/home/alice` fixture in `tests/test_validate.py`; the skills pass the
-validator's private-term check. The repository is public following a review of
-the tracked files, Git history and repository publication surfaces.
+14 skills in five domains. The fast gate covers catalog and routing-fixture
+validation, validator unit tests, the process-snapshot helper's success and
+failure paths, Python checks, shellcheck and Nix lint.
+
+Routing cases are structural rubrics, not executed model comparisons.
+No before/after model evaluation has established a quality improvement for
+this catalog. The macOS helper paths and shell recipes are not verified by
+the Linux gate; test them on macOS before claiming cross-platform behavior.

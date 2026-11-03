@@ -1,44 +1,33 @@
 ---
 name: fast-checks
-description: Choose and run proportionate verification for a code or configuration change. Use when deciding which existing checks demonstrate the changed behavior, or when a check fails.
+description: Use when selecting checks for changed behavior or diagnosing a failed check; not for unrelated read-only investigation.
 ---
 
-# Fast verification
+# Verify the changed contract
 
-Derive verification from the requested behavior and the repository's own
-declared commands. Find them in the agent instructions, README or CONTRIBUTING,
-then `justfile`, `Makefile`, package scripts or the CI workflow; CI shows which
-checks the project actually trusts. Do not invent a new gate.
+Use the repository's declared gate and supported environment. Select
+additional checks from the behavior at risk, not a generic list of tools.
+Entering a development shell is setup, not verification.
 
-Verification is proportionate, not minimal.
+- For code or configuration changes, run the owning fast gate or declared
+  equivalent.
+- For runtime, packaging, or build-output changes, also exercise the affected
+  path: a focused test, CLI invocation, build, or request. Reuse coverage
+  already supplied by the gate instead of rerunning the same check by habit.
+- Read-only questions need source evidence, not unrelated builds. Repository
+  documentation uses its applicable checks; external plans need source and
+  acceptance review.
 
-For read-only investigation, gather the evidence needed for the question;
-unrelated code checks add no evidence. External planning documents need source
-and acceptance review, while repository documentation uses its owning checks.
+Keep one check running per repository, preserve its handle, and reuse passing
+results while inputs remain unchanged. Stay within authorized workload and
+resource limits. Stop owned preview servers when finished.
+Full system builds, VM tests, model runs, and benchmarks need explicit
+authorization for that workload; a routine verification request is not
+such a grant.
 
-1. For code or configuration changes, run the repository's fast gate (lint,
-   format check, type check, unit tests), or its declared equivalent.
-2. When the change affects build output, packaging or runtime behavior, also
-   run the relevant build or test command, or start the application and
-   exercise the changed path: a focused test, one CLI invocation or one
-   request. Stay within the host's resource limits.
-3. Short-lived development or preview servers are allowed for this; stop them
-   before finishing and report how they were run.
-4. Heavy workloads (full system builds, VM tests, model runs, benchmarks)
-   require an explicit request.
+On failure, retain the command, exit status, and decisive diagnostic.
+Distinguish baseline failures from regressions when practical. Fix the cause,
+not the assertion; never skip or weaken a check for green output.
 
-Entering a development shell provides an environment; it is not a test.
-Run one check per repository at a time and keep its process handle. Reuse a
-passing result while code, inputs and environment are unchanged; a
-documentation edit rarely invalidates runtime tests.
-
-On failure keep the command, exit status and decisive diagnostic. Separate a
-pre-existing failure (reproduce it on the unchanged baseline when cheap) from a
-regression. Fix the cause and rerun the affected check; never weaken an
-assertion or skip a test to get green. If tests pass but behavior is wrong,
-check whether they exercise the changed path at all.
-
-Review the final diff for accidental files and overlap with unrelated work.
-Report what passed, what could not run and what each result actually proves.
-A formatter, evaluator or mocked unit test does not establish user-facing
-behavior.
+State what each result proves and what remains untested. A formatter,
+evaluator, or mocked unit test does not establish user-facing behavior.

@@ -1,45 +1,38 @@
 ---
 name: portable-shell
-description: Write shell commands and scripts that behave the same on Linux and macOS, in bash and zsh, with GNU or BSD userlands. Use when writing or debugging a shell script, a one-liner that uses sed/date/stat/find/xargs, or a command that failed with "no matches found", "illegal option" or word-splitting surprises.
+description: Use for shell portability across bash, zsh, Linux, and macOS, especially globbing, word splitting, shebangs, or GNU/BSD option differences.
 ---
 
-# Portable shell
+# Preserve shell and userland semantics
 
-**Know the target first.** Check `uname -s` and the interactive shell
-(`echo "$0"`, `$ZSH_VERSION`, `$BASH_VERSION`). Check the userland flavor:
-`sed --version` succeeds only for GNU sed. On macOS, Nix or Homebrew may put GNU
-tools first in `PATH` (sometimes as `gsed` or `gdate`).
+Establish the target shell and installed utilities where they affect the
+command. The login shell, script interpreter, and userland can differ.
+macOS can run GNU utilities; Linux can use BusyBox. Do not infer the executable
+from the OS or a rejected `--version`.
 
-**bash and zsh differ where agents trip:**
-- zsh does not word-split unquoted `$var`. Iterate with a `for` loop over
-  explicit words or an array instead of relying on splitting.
-- zsh treats an unmatched glob as an error ("no matches found"). Quote
-  patterns meant for the tool (`find . -name '*.nix'`), and guard optional
-  globs.
-- zsh expands a word that starts with `=` to a command path, so `echo ===`
-  fails with "== not found". Quote such words: `echo '==='`.
-- `/bin/bash` does not exist everywhere (NixOS, some containers), and macOS
-  `/bin/bash` is 3.2: no `mapfile`, associative arrays or `${var,,}`. Use
-  `#!/usr/bin/env bash` and features the oldest target supports, or write
-  POSIX `sh` (`#!/bin/sh`).
+## Failure-prone differences
 
-**Script hygiene:**
-- Start with `set -eu`; in bash add `set -o pipefail`.
-- Quote every expansion and pass `--` before user-supplied paths.
-- Use `printf '%s\n'`, not `echo -e`. Read lines with `while IFS= read -r line`.
-- Handle odd filenames with `find … -print0 | xargs -0` or `find … -exec … {} +`.
-  Never parse `ls`.
-- Use `command -v` instead of `which`. Clean up with `trap 'rm -rf -- "$tmp"' EXIT`.
-- Create temp paths with `mktemp "${TMPDIR:-/tmp}/name.XXXXXX"`, which works on
-  both GNU and BSD.
-- Run `shellcheck` when it is available, and fix findings instead of
-  disabling them.
+- zsh does not split unquoted `$var` like bash, and an unmatched glob normally
+  errors. Use explicit arguments or arrays; quote patterns intended for tools.
+- zsh can expand a word starting with `=` as a command path. Quote literal
+  separators such as `'==='`.
+- `/bin/bash` is not universal; macOS's system bash is 3.2. An environment
+  shebang still needs a suitable interpreter in `PATH`. Avoid associative
+  arrays, `mapfile`, and `${var,,}` on that older target.
+- `set -e` is context-sensitive, not universal failure handling. Handle
+  expected nonzero statuses explicitly and preserve pipeline failures where
+  supported. Do not add strict-mode flags without checking the script's
+  control flow and target shell.
+- Preserve arbitrary filenames with NUL-delimited processing or
+  `find ... -exec ... {} +`; never parse `ls`. Quote expansions and protect
+  leading-dash operands using the command's supported syntax.
+- Create temporary paths securely, quote cleanup, and remove only paths the
+  invocation owns. Replacing a file can change permissions, links, or metadata.
 
-**GNU vs BSD flags** differ for `sed -i`, `date`, `stat`, `readlink -f`,
-`grep -P`, `xargs -r`, `find -printf`, `base64`, checksums, `timeout` and
-CPU counting. Look up the portable form in
-[references/gnu-bsd.md](references/gnu-bsd.md) before using any of them in a
-script meant for both systems.
+For `sed -i`, dates, `stat`, canonical paths, `xargs`, checksums, and timeouts,
+consult [references/gnu-bsd.md](references/gnu-bsd.md) for the relevant
+difference rather than loading every platform recipe.
 
-Verify a portable script on each target you can reach, or name the untested
-one. Report which shell and userland the command was checked with.
+Use available shell checks and exercise the affected behavior on reachable
+targets. Name the tested shell/userland and any untested target; one Linux run
+does not prove macOS compatibility.

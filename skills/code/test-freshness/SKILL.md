@@ -1,30 +1,27 @@
 ---
 name: test-freshness
-description: Check whether tests still detect the intended failure. Use when interfaces change, mocks may have drifted, a regression test is being added, or green tests conflict with observed behavior.
+description: Use when a regression test is added, mocks may have drifted, interfaces change, or green tests conflict with observed behavior.
 ---
 
-# Test relevance
+# Would the test catch the failure?
 
-- Trace one important assertion through its fixture or mock to the production
-  behavior. Compare mocked arguments and return values with the current
-  interface.
-- Look for a test that would stay green if the behavior disappeared: unused
-  fixtures, assertions on setup alone, mocks that bypass the changed path,
-  snapshot files regenerated without review.
-- When practical, show the regression test failing on the old behavior or a
-  temporary controlled fault (revert the fix, flip a condition). Remove the
-  fault before final verification.
-- Prefer an observable outcome over source-text matching. Do not add hash
-  guards merely because files changed.
-- Distinguish a stale test from a product defect. Repair the relevant contract
-  without relaxing the expected outcome.
+Trace an important assertion through its fixture or mock to the production
+behavior. Compare the mocked interface with the real caller's arguments,
+return values, and failure modes.
 
-## Fingerprints are bounded evidence
+Look for false reassurance: assertions on setup alone, unused fixtures,
+mocks that bypass the changed path, or snapshots regenerated without review.
+Prefer observable outcomes to matching source text.
 
-A hash detects only the bytes it was given; it never proves behavior or oracle
-quality. Prefer a narrow, optional freshness manifest at a fragile boundary over
-a mandatory hash per test. Keep the expected baseline separate from the
-current computation and never regenerate it just to restore green.
+Where practical, demonstrate that the regression test fails on the old
+behavior or a controlled fault. Remove the fault before final verification.
+Distinguish a stale test from a product defect; repair the contract without
+relaxing the expected outcome.
 
-Report which assertions were traced, which fault the test caught or missed,
-and any test that was repaired or remains suspect.
+A fingerprint proves only that selected bytes match, not that a test detects
+a bug. Use freshness manifests only at boundaries that need them; keep the
+expected baseline separate and never regenerate it merely to restore green.
+
+Report the assertion traced, the fault caught or missed, and any remaining
+coverage gap. Do not present structural fixture validation as an executed
+end-to-end test.

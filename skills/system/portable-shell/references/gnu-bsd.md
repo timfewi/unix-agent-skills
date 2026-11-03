@@ -1,12 +1,12 @@
 # GNU vs BSD/macOS quick reference
 
-Check the installed variant with `<tool> --version` (GNU prints a banner; BSD
-tools usually reject the flag) and `man <tool>`. Older macOS releases lack some
-of the newer BSD additions noted below.
+Check the installed executable and its help or manual. GNU often supports
+`--version`, but rejection does not prove BSD: BusyBox and wrappers differ too.
+Older macOS releases lack some of the newer BSD additions noted below.
 
 | Task | GNU (Linux) | BSD (macOS) | Portable choice |
 | --- | --- | --- | --- |
-| In-place edit | `sed -i 's/a/b/' f` | `sed -i '' 's/a/b/' f` | `sed 's/a/b/' f > f.tmp && mv f.tmp f`, or `perl -pi -e 's/a/b/' f` |
+| In-place edit | `sed -i 's/a/b/' f` | `sed -i '' 's/a/b/' f` | Write to a securely created sibling temporary file, then replace only if the required permissions, link and metadata semantics are preserved |
 | Extended regex | `sed -E`, `grep -E` | same | `-E`; avoid GNU-only `\+`, `\?` in basic regex |
 | Perl regex | `grep -P` | not available | `grep -E`, `rg`, or `perl -ne` |
 | Date arithmetic | `date -d '1 day ago' +%F` | `date -v-1d +%F` | compute in `python3`/`perl`, or branch on `uname -s` |

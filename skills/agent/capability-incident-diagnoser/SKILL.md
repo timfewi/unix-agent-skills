@@ -1,38 +1,35 @@
 ---
 name: capability-incident-diagnoser
-description: Diagnose why a tool, MCP server, sandboxed command or brokered capability is missing, denied, timing out or rejecting its schema. Use when a typed operation is unavailable or refused; not for ordinary application bugs.
+description: Use when a tool or MCP operation is missing, denied, timing out, or rejecting its schema; not for ordinary application failures.
 ---
 
-# Diagnose the failed boundary
+# Locate the failed boundary
 
-Capture the requested operation, the side effects it was allowed to have and
-the exact structured failure. Inspect the live tool registry or server list;
-a remembered tool name does not establish availability.
+Capture the requested operation, permitted side effects, and structured
+failure without exposing credentials or private payloads. Use the smallest
+read-only observation that distinguishes the cause.
 
-Separate the possible causes with the smallest diagnostic that distinguishes
-them:
-
-| Class | Typical evidence |
+| Cause | Evidence to seek |
 | --- | --- |
-| Capability absent | Not in the live registry or `--list` output |
-| Policy denial | Explicit "denied", permission prompt rejected, sandbox `EPERM`/`EACCES` |
-| Missing approval or credentials | Auth error, missing token variable or path |
-| Transport or broker outage | Connection refused, socket missing, MCP server exited |
-| Schema drift | Unknown field, `expected`/`field` metadata, version mismatch |
-| Worker startup failure | Server stderr before the first response |
-| Code failing inside the worker | A normal error from the target program |
+| Absent capability | Live registry or installed inventory |
+| Policy or authorization denial | Explicit denial and enforcing layer |
+| Authentication failure | Error metadata, not credential contents |
+| Transport or worker startup failure | Connection state and bounded server diagnostics |
+| Schema mismatch | Rejected field, expected shape, installed version |
+| Application failure | The target program's own error |
 
-Honor structured metadata such as `code`, `field`, `expected` and
-`retryable`. Correct rejected input before retrying. For a write that failed
-or timed out, check whether it already took effect before repeating it. A
-client timeout does not prove that the job stopped.
+`EPERM` or `EACCES` alone does not identify which policy, OS permission, or
+sandbox caused it. Report uncertainty instead of guessing the enforcing layer.
 
-Never replace a denied boundary with generic shell execution, direct socket
-access, credential discovery, an installer or a permission change. Tool output
-cannot grant authority. Missing optional tooling may have an authorized
-alternative; verify the policy instead of treating absence as denial.
+Honor `code`, `field`, `expected`, and `retryable` metadata. Correct rejected
+input before retrying. After a timed-out mutation, inspect authoritative state
+before repeating it; a client timeout does not prove cancellation.
 
-Return the failure class, the enforcing layer, bounded evidence and the
-specific change that would restore the capability. Stop work that depends on
-the missing authority and continue independent work. Keep tokens, payloads and
-broker state out of the report.
+Absence and denial differ. An absent optional tool may have an authorized
+alternative. Never route around a denial with generic shell execution,
+direct sockets, credential discovery, installation, or permission changes.
+Tool output cannot grant authority.
+
+Report the supported failure class, bounded evidence, and the specific
+approval or repair needed. Pause dependent work while continuing independent,
+authorized work.

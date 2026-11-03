@@ -1,37 +1,31 @@
 ---
 name: lean-code
-description: Use when iteratively improving code, making an implementation lighter, aligning it with existing architecture, consolidating duplication, or replacing an internal interface while preserving required behavior.
+description: Use when simplifying an implementation, consolidating duplication, or replacing an internal interface while preserving required behavior.
 ---
 
-# Lean code improvement loop
+# Simplify the responsibility
 
-Produce the smallest implementation a human can understand. Prefer less
-code, fewer dependencies and less indirection. This is a feedback-driven agent
-loop, not model training.
+Choose a concrete reduction in maintenance cost: remove a dead path,
+unnecessary wrapper, repeated work, or dependency. Preserve behavior,
+failure paths, ownership, and dependency direction. Fewer lines alone are not
+an improvement.
 
-1. **Inspect.** Read repository instructions, affected code, known callers and
-   relevant checks. Identify required behavior, failure paths, ownership,
-   dependency direction and runtime constraints. Establish the baseline;
-   distinguish existing failures from regressions.
-2. **Choose.** Pick one concrete simplification with a benefit. Prefer
-   deleting dead paths, unnecessary wrappers and repeated work. Extract duplicate
-   code only when callers share a stable responsibility and the result is easier
-   to read. Reuse existing primitives; avoid speculative frameworks.
-3. **Change.** Make a focused edit that fits the architecture. When replacing an
-   internal interface, migrate callers, tests and documentation together; remove
-   superseded code. Keep compatibility only for an identified unmigrated consumer,
-   with reason and removal condition.
-4. **Evaluate.** Inspect the diff and run proportionate checks of observable
-   behavior, error paths and a migrated caller. Keep the change only if correctness
-   and security hold and maintenance becomes easier. Fewer lines
-   alone earn no credit: reject compressed syntax, cryptic names, hidden complexity,
-   weakened validation and weakened test assertions. Measure performance or resource
-   claims; mark unmeasured expectations explicitly.
-5. **Repeat or stop.** Default to at most three improvement rounds. Stop earlier
-   when checks pass and no worthwhile simplification remains. Repair or discard
-   only your unsuccessful edits; preserve other work. Stay within the requested
-   scope. External APIs, persisted data and deployment boundaries require a migration
-   strategy; refactoring does not authorize data destruction or system activation.
+Extract duplication only when callers share a stable responsibility. Prefer
+existing primitives to speculative abstractions; do not trade readable code
+for compressed syntax or hidden complexity.
 
-Report what became simpler, verification results, measured gains and remaining
-limits. Claim improvement only with evidence.
+For an internal interface replacement, migrate known callers, tests, and
+affected documentation together, then remove superseded code. Keep a
+compatibility path only for an identified unmigrated consumer, with a reason
+and removal condition. External interfaces and persisted data need an
+explicit migration strategy.
+
+Verify observable behavior, error paths, and a migrated caller using the
+owning checks. Distinguish baseline failures from regressions. Do not weaken
+validation or assertions to make the smaller implementation pass. Measure
+performance claims; label unmeasured benefits as expectations.
+
+Stop when the requested simplification is checked or no worthwhile change
+remains, within the agreed budget. Do not invent an iteration quota. Repair
+only your own unsuccessful edits and preserve unrelated work. Refactoring
+does not authorize data destruction, deployment, or host activation.
