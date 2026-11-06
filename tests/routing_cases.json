@@ -372,6 +372,15 @@
       "cases": [
         {
           "kind": "positive",
+          "prompt": "The fast gate failed on a regression introduced by this task. The trusted host policy already authorizes its focused VM test within a fixed budget.",
+          "expected_selected": ["fast-checks"],
+          "expected_excluded": [],
+          "expected_initial_tools": ["inspect the failure and repair the task-caused regression"],
+          "unavailable_or_forbidden_tools": ["ending the task at the first failing check", "asking again for the existing workload grant", "publishing while required checks fail"],
+          "expected_completion_evidence": ["passing required gate and focused test within the existing budget, or a precise remaining blocker"]
+        },
+        {
+          "kind": "positive",
           "prompt": "The declared fast gate just passed and already exercised the changed CLI path. Sources and environment are unchanged. Is another identical smoke run needed?",
           "expected_selected": ["fast-checks"],
           "expected_excluded": [],

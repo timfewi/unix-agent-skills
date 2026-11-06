@@ -16,4 +16,5 @@ the layout or the validator.
   success and failure in `tests/`.
 - Text is English. Run `project-check fast` before handoff. `project-check full`
   evaluates all systems and builds the catalog check; it is a separate workload.
-- Commits, pushes, visibility changes and releases need explicit authorization.
+- Use the current task and trusted harness policy for Git and publication
+  authority; reuse existing grants. This guide adds no permission or approval gate.

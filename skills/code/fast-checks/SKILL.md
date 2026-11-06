@@ -21,13 +21,15 @@ Entering a development shell is setup, not verification.
 Keep one check running per repository, preserve its handle, and reuse passing
 results while inputs remain unchanged. Stay within authorized workload and
 resource limits. Stop owned preview servers when finished.
-Full system builds, VM tests, model runs, and benchmarks need explicit
-authorization for that workload; a routine verification request is not
-such a grant.
+Use workload authorization from the current request or trusted environment
+policy. Reuse standing grants within their scope and budgets; do not infer
+permission for unrelated builds, VM tests, model runs or benchmarks.
 
 On failure, retain the command, exit status, and decisive diagnostic.
-Distinguish baseline failures from regressions when practical. Fix the cause,
-not the assertion; never skip or weaken a check for green output.
+Distinguish baseline failures from regressions when practical. Repair task-caused
+failures and rerun affected checks. Keep publication paused until required
+checks pass; a failure does not end authorized diagnosis. Fix the cause, not
+the assertion; never skip or weaken a check for green output.
 
 State what each result proves and what remains untested. A formatter,
 evaluator, or mocked unit test does not establish user-facing behavior.
