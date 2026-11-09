@@ -80,6 +80,11 @@ class ValidateTest(unittest.TestCase):
         self.assertEqual(sorted(skills), ["one-skill", "two-skill"])
         self.assertEqual(cases, 4)
 
+    def test_formatter_blank_lines_in_frontmatter_preserve_metadata(self):
+        text = "---\n\nname: one-skill\n\ndescription: Use when inspecting a fixture.\n---\n\nPlain guidance.\n"
+        self.write_skill("alpha", "one-skill", "", frontmatter=text)
+        self.assertEqual(self.errors(), [])
+
     def test_native_invocation_policy_is_supported_and_linked(self):
         directory = self.write_skill(
             "alpha", "one-skill", "See [native policy](agents/openai.yaml)."

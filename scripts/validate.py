@@ -46,6 +46,10 @@ def parse_frontmatter(text: str) -> dict[str, str] | None:
     end = lines.index("---", 1)
     values = {}
     for line in lines[1:end]:
+        # Markdown formatters may insert valid YAML whitespace inside metadata.
+        # Keep validating the same fields rather than rejecting their layout.
+        if not line.strip():
+            continue
         key, separator, value = line.partition(":")
         if not separator:
             return None
